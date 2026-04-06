@@ -8,7 +8,8 @@ abstract class ApphudPushNotificationsPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static ApphudPushNotificationsPlatform _instance = MethodChannelApphudPushNotifications();
+  static ApphudPushNotificationsPlatform _instance =
+      MethodChannelApphudPushNotifications();
 
   /// The default instance of [ApphudPushNotificationsPlatform] to use.
   ///
@@ -23,7 +24,13 @@ abstract class ApphudPushNotificationsPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+  /// iOS only. Requests notification permission and registers for remote notifications.
+  ///
+  /// Call after `Apphud.start` from the main `apphud` package. Enable Push Notifications
+  /// capability (and background modes if needed) in Xcode.
+  Future<void> registerForPushNotifications() {
+    throw UnimplementedError(
+      'registerForPushNotifications() has not been implemented.',
+    );
   }
 }

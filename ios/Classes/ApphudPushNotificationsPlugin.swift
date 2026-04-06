@@ -6,12 +6,14 @@ public class ApphudPushNotificationsPlugin: NSObject, FlutterPlugin {
     let channel = FlutterMethodChannel(name: "apphud_push_notifications", binaryMessenger: registrar.messenger())
     let instance = ApphudPushNotificationsPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
+    registrar.addApplicationDelegate(instance)
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
-    case "getPlatformVersion":
-      result("iOS " + UIDevice.current.systemVersion)
+    case "registerForPushNotifications":
+      ApphudPushNotificationsPlugin.registerForPushNotifications()
+      result(nil)
     default:
       result(FlutterMethodNotImplemented)
     }

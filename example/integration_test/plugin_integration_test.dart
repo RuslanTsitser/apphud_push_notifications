@@ -14,11 +14,10 @@ import 'package:apphud_push_notifications/apphud_push_notifications.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('getPlatformVersion test', (WidgetTester tester) async {
+  testWidgets('registerForPushNotifications completes', (
+    WidgetTester tester,
+  ) async {
     final ApphudPushNotifications plugin = ApphudPushNotifications();
-    final String? version = await plugin.getPlatformVersion();
-    // The version string depends on the host platform running the test, so
-    // just assert that some non-empty string is returned.
-    expect(version?.isNotEmpty, true);
+    await plugin.registerForPushNotifications();
   });
 }

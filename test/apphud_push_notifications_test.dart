@@ -8,21 +8,25 @@ class MockApphudPushNotificationsPlatform
     with MockPlatformInterfaceMixin
     implements ApphudPushNotificationsPlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
+  Future<void> registerForPushNotifications() => Future.value();
 }
 
 void main() {
-  final ApphudPushNotificationsPlatform initialPlatform = ApphudPushNotificationsPlatform.instance;
+  final ApphudPushNotificationsPlatform initialPlatform =
+      ApphudPushNotificationsPlatform.instance;
 
   test('$MethodChannelApphudPushNotifications is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelApphudPushNotifications>());
+    expect(
+      initialPlatform,
+      isInstanceOf<MethodChannelApphudPushNotifications>(),
+    );
   });
 
-  test('getPlatformVersion', () async {
-    ApphudPushNotifications apphudPushNotificationsPlugin = ApphudPushNotifications();
-    MockApphudPushNotificationsPlatform fakePlatform = MockApphudPushNotificationsPlatform();
+  test('registerForPushNotifications forwards to platform', () async {
+    final plugin = ApphudPushNotifications();
+    final fakePlatform = MockApphudPushNotificationsPlatform();
     ApphudPushNotificationsPlatform.instance = fakePlatform;
 
-    expect(await apphudPushNotificationsPlugin.getPlatformVersion(), '42');
+    await plugin.registerForPushNotifications();
   });
 }

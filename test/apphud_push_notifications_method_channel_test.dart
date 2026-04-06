@@ -5,13 +5,15 @@ import 'package:apphud_push_notifications/apphud_push_notifications_method_chann
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  MethodChannelApphudPushNotifications platform = MethodChannelApphudPushNotifications();
+  MethodChannelApphudPushNotifications platform =
+      MethodChannelApphudPushNotifications();
   const MethodChannel channel = MethodChannel('apphud_push_notifications');
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-          return '42';
+          expect(methodCall.method, 'registerForPushNotifications');
+          return null;
         });
   });
 
@@ -20,7 +22,7 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('getPlatformVersion', () async {
-    expect(await platform.getPlatformVersion(), '42');
+  test('registerForPushNotifications invokes method channel', () async {
+    await platform.registerForPushNotifications();
   });
 }
