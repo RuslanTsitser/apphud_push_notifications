@@ -2,6 +2,15 @@ import UIKit
 import UserNotifications
 import ApphudSDK
 
+private func isFlutterLocalNotificationsPayload(_ userInfo: [AnyHashable: Any]) -> Bool {
+    // Удалённый APNs-пейлоуд flutter_local_notifications: completionHandler вызывает только FLN.
+    userInfo["NotificationId"] != nil
+        && userInfo["presentAlert"] != nil
+        && userInfo["presentSound"] != nil
+        && userInfo["presentBadge"] != nil
+        && userInfo["payload"] != nil
+}
+
 extension ApphudPushNotificationsPlugin {
     static func registerForPushNotifications() {
         let center = UNUserNotificationCenter.current()
@@ -21,37 +30,41 @@ extension ApphudPushNotificationsPlugin {
         Apphud.submitPushNotificationsToken(token: deviceToken, callback: nil)
     }
 
-    public func application(
-        _ application: UIApplication,
-        didFailToRegisterForRemoteNotificationsWithError error: Error
-    ) {
-        // Host app may log in its own AppDelegate if needed.
-    }
-
+    @objc(userNotificationCenter:willPresentNotification:withCompletionHandler:)
     public func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // ApphudSDK marks handlePushNotification as MainActor; delegate callbacks are not.
-        Task { @MainActor in
-            let isHandled = Apphud.handlePushNotification(apsInfo: notification.request.content.userInfo)
-            if isHandled {
-                completionHandler([])
-            }
+        let userInfo = notification.request.content.userInfo
+        if isFlutterLocalNotificationsPayload(userInfo) {
+            return
         }
-    }
 
-    public func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-    ) {
-        Task { @MainActor in
-            let isHandled = Apphud.handlePushNotification(apsInfo: response.notification.request.content.userInfo)
-            if isHandled {
-                completionHandler()
+        // completionHandler нужно вызвать до возврата из метода; отложенный Task даёт пустой пресент.
+        let isHandled: Bool = {
+            if Thread.isMainThread {
+                return MainActor.assumeIsolated {
+                    Apphud.handlePushNotification(apsInfo: userInfo)
+                }
             }
+            var result = false
+            DispatchQueue.main.sync {
+                result = MainActor.assumeIsolated {
+                    Apphud.handlePushNotification(apsInfo: userInfo)
+                }
+            }
+            return result
+        }()
+
+        if isHandled {
+            completionHandler([])
+            return
+        }
+        if #available(iOS 14.0, *) {
+            completionHandler([.banner, .list, .sound])
+        } else {
+            completionHandler([.alert, .sound, .badge])
         }
     }
 }
