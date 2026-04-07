@@ -14,6 +14,8 @@ public class ApphudPushNotificationsPlugin: NSObject, FlutterPlugin {
     case "registerForPushNotifications":
       ApphudPushNotificationsPlugin.registerForPushNotifications()
       result(nil)
+    case "getApnsToken":
+      result(ApphudPushNotificationsPlugin.apnsToken)
     default:
       result(FlutterMethodNotImplemented)
     }

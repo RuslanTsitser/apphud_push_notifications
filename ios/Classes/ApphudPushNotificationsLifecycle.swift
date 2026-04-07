@@ -12,6 +12,8 @@ private func isFlutterLocalNotificationsPayload(_ userInfo: [AnyHashable: Any]) 
 }
 
 extension ApphudPushNotificationsPlugin {
+    static var apnsToken: String?
+
     static func registerForPushNotifications() {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in
@@ -27,6 +29,8 @@ extension ApphudPushNotificationsPlugin {
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
+        let tokenHex = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        ApphudPushNotificationsPlugin.apnsToken = tokenHex
         Apphud.submitPushNotificationsToken(token: deviceToken, callback: nil)
     }
 

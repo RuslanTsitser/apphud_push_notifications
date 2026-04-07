@@ -14,4 +14,9 @@ class MethodChannelApphudPushNotifications
   Future<void> registerForPushNotifications() async {
     await methodChannel.invokeMethod<void>('registerForPushNotifications');
   }
+
+  @override
+  Future<String?> getApnsToken() async {
+    return methodChannel.invokeMethod<String>('getApnsToken');
+  }
 }

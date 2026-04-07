@@ -9,6 +9,9 @@ class MockApphudPushNotificationsPlatform
     implements ApphudPushNotificationsPlatform {
   @override
   Future<void> registerForPushNotifications() => Future.value();
+
+  @override
+  Future<String?> getApnsToken() => Future.value('token');
 }
 
 void main() {
@@ -28,5 +31,14 @@ void main() {
     ApphudPushNotificationsPlatform.instance = fakePlatform;
 
     await plugin.registerForPushNotifications();
+  });
+
+  test('getApnsToken forwards to platform', () async {
+    final plugin = ApphudPushNotifications();
+    final fakePlatform = MockApphudPushNotificationsPlatform();
+    ApphudPushNotificationsPlatform.instance = fakePlatform;
+
+    final token = await plugin.getApnsToken();
+    expect(token, 'token');
   });
 }

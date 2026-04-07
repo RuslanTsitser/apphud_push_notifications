@@ -12,8 +12,14 @@ void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-          expect(methodCall.method, 'registerForPushNotifications');
-          return null;
+          switch (methodCall.method) {
+            case 'registerForPushNotifications':
+              return null;
+            case 'getApnsToken':
+              return 'token';
+            default:
+              fail('Unexpected method: ${methodCall.method}');
+          }
         });
   });
 
@@ -24,5 +30,10 @@ void main() {
 
   test('registerForPushNotifications invokes method channel', () async {
     await platform.registerForPushNotifications();
+  });
+
+  test('getApnsToken invokes method channel', () async {
+    final token = await platform.getApnsToken();
+    expect(token, 'token');
   });
 }

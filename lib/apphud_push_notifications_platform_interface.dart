@@ -33,4 +33,13 @@ abstract class ApphudPushNotificationsPlatform extends PlatformInterface {
       'registerForPushNotifications() has not been implemented.',
     );
   }
+
+  /// Returns the latest APNs token in hex format, if available.
+  ///
+  /// iOS only. Returns `null` if token is not yet received.
+  Future<String?> getApnsToken() {
+    throw UnimplementedError(
+      'getApnsToken() has not been implemented.',
+    );
+  }
 }
